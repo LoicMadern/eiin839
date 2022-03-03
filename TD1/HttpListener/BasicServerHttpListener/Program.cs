@@ -6,6 +6,9 @@ using System.Text;
 
 namespace BasicServerHTTPlistener
 {
+    
+    public sealed class Header : System.Net.Http.Headers.HttpHeaders
+    {}
     internal class Program
     {
         private static void Main(string[] args)
