@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Web;
 
@@ -18,8 +20,8 @@ namespace BasicServerHTTPlistener
                 Console.WriteLine("A more recent Windows version is required to use the HttpListener class.");
                 return;
             }
- 
- 
+
+
             // Create a listener.
             HttpListener listener = new HttpListener();
 
@@ -71,7 +73,7 @@ namespace BasicServerHTTPlistener
                         documentContents = readStream.ReadToEnd();
                     }
                 }
-                
+
                 // get url 
                 Console.WriteLine($"Received request for {request.Url}");
 
@@ -92,6 +94,10 @@ namespace BasicServerHTTPlistener
                     Console.WriteLine(str);
                 }
 
+
+                Console.WriteLine(request.Url.Segments[0]);
+                if (request.Url.Segments.Length >= 2) Console.WriteLine("methode : " + request.Url.Segments[1]);
+
                 //get params un url. After ? and between &
 
                 Console.WriteLine(request.Url.Query);
@@ -105,21 +111,77 @@ namespace BasicServerHTTPlistener
                 //
                 Console.WriteLine(documentContents);
 
+                string param1 = HttpUtility.ParseQueryString(request.Url.Query).Get("param1");
+                string param2 = HttpUtility.ParseQueryString(request.Url.Query).Get("param2");
+
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
 
                 // Construct a response.
-                string responseString = "<HTML><BODY> Hello world!</BODY></HTML>";
-                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
+                string responseString = "<HTML><BODY> Presentation!</BODY></HTML>";
+
+                Type type = typeof(MyMethods);
+                MethodInfo method = type.GetMethod(request.Url.Segments[1]);
+                MyMethods methods = new MyMethods();
+                string result = (string)method.Invoke(methods, new object[] { param1, param2 });
+
+                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString + result);
                 // Get a response stream and write the response to it.
                 response.ContentLength64 = buffer.Length;
                 System.IO.Stream output = response.OutputStream;
                 output.Write(buffer, 0, buffer.Length);
                 // You must close the output stream.
                 output.Close();
+
+                Console.WriteLine(result);
+
+
             }
             // Httplistener neither stop ... But Ctrl-C do that ...
             // listener.Stop();
         }
+    }
+}
+
+public class MyMethods
+{
+    //Exercice 1
+    public string MyMethod(string param1, string param2)
+    {
+        string content = "<html><body > Bonjour je m'apelle " + param1 + " " +  param2 + " </body></html>";
+        return content;
+    }
+
+    //Exercice 2
+    public string CallAnExecutable(string param1, string param2)
+    {
+        Console.WriteLine("je suis param 1 " + param1);
+        ProcessStartInfo start = new ProcessStartInfo();
+        start.FileName = @"C:\Users\Loic\Documents\Polytech\S8\soc\eiin839\TD2\ExecTest\bin\Debug\ExecTest.exe"; // Specify exe name.
+        start.Arguments = param1 + " " + param2; // Specify arguments.
+        start.UseShellExecute = false;
+        start.RedirectStandardOutput = true;
+        //
+        // Start the process.
+        //
+        using (Process process = Process.Start(start))
+        {
+            //
+            // Read in all the text from the process with the StreamReader.
+            //
+            using (StreamReader reader = process.StandardOutput)
+            {
+                string result = reader.ReadToEnd();
+
+                return result;
+            }
+        }
+    }
+
+    //Exercice 3
+    public int incr(int value)
+    {
+        value += 1;
+        return value;
     }
 }
