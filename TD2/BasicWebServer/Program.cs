@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Web;
 
 namespace BasicServerHTTPlistener
@@ -96,6 +97,7 @@ namespace BasicServerHTTPlistener
 
 
                 Console.WriteLine(request.Url.Segments[0]);
+               
                 if (request.Url.Segments.Length >= 2) Console.WriteLine("methode : " + request.Url.Segments[1]);
 
                 //get params un url. After ? and between &
@@ -111,8 +113,7 @@ namespace BasicServerHTTPlistener
                 //
                 Console.WriteLine(documentContents);
 
-                string param1 = HttpUtility.ParseQueryString(request.Url.Query).Get("param1");
-                string param2 = HttpUtility.ParseQueryString(request.Url.Query).Get("param2");
+               
 
                 // Obtain a response object.
                 HttpListenerResponse response = context.Response;
@@ -121,19 +122,51 @@ namespace BasicServerHTTPlistener
                 string responseString = "<HTML><BODY> Presentation!</BODY></HTML>";
 
                 Type type = typeof(MyMethods);
-                MethodInfo method = type.GetMethod(request.Url.Segments[1]);
-                MyMethods methods = new MyMethods();
-                string result = (string)method.Invoke(methods, new object[] { param1, param2 });
+             
+               
+                
+                var mymethods = type.GetMethods();
 
-                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString + result);
-                // Get a response stream and write the response to it.
-                response.ContentLength64 = buffer.Length;
-                System.IO.Stream output = response.OutputStream;
-                output.Write(buffer, 0, buffer.Length);
-                // You must close the output stream.
-                output.Close();
+                bool no_problem_param = true; 
+                foreach (var mymethod in mymethods)
+                {
+                    if(mymethod.Name != request.Url.Segments[1])
+                    {
+                        no_problem_param = false;
+                        break;
+                    }
 
-                Console.WriteLine(result);
+                }
+
+    
+
+                if (no_problem_param)
+                {
+                    MethodInfo method = type.GetMethod(request.Url.Segments[1]);
+
+                    string result;
+                    string param1 = HttpUtility.ParseQueryString(request.Url.Query).Get("param1");
+
+                    if (HttpUtility.ParseQueryString(request.Url.Query).Count > 1)
+                    {
+                        string param2 = HttpUtility.ParseQueryString(request.Url.Query).Get("param2");
+                        result = (string)method.Invoke(mymethods, new object[] { param1, param2 });
+                    }
+                    else
+                    {
+                        result = (string)method.Invoke(mymethods, new object[] { param1 });
+                    }
+
+                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString + result);
+                    // Get a response stream and write the response to it.
+                    response.ContentLength64 = buffer.Length;
+                    System.IO.Stream output = response.OutputStream;
+                    output.Write(buffer, 0, buffer.Length);
+                    // You must close the output stream.
+                    output.Close();
+
+                    Console.WriteLine(result);
+                }
 
 
             }
@@ -155,7 +188,7 @@ public class MyMethods
     //Exercice 2
     public string CallAnExecutable(string param1, string param2)
     {
-        Console.WriteLine("je suis param 1 " + param1);
+     
         ProcessStartInfo start = new ProcessStartInfo();
         start.FileName = @"C:\Users\Loic\Documents\Polytech\S8\soc\eiin839\TD2\ExecTest\bin\Debug\ExecTest.exe"; // Specify exe name.
         start.Arguments = param1 + " " + param2; // Specify arguments.
@@ -172,16 +205,19 @@ public class MyMethods
             using (StreamReader reader = process.StandardOutput)
             {
                 string result = reader.ReadToEnd();
-
                 return result;
             }
         }
     }
 
     //Exercice 3
-    public int incr(int value)
+    public string incr(string value)
     {
-        value += 1;
-        return value;
+        int myInt = int.Parse(value);
+        myInt ++;
+        Console.WriteLine(myInt);
+        string toString = myInt.ToString();
+        string content = JsonSerializer.Serialize(toString);
+        return content;
     }
 }
