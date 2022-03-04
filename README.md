@@ -1,3 +1,22 @@
+#commandes pour rendu 1 TP2
+
+exo1:
+http://localhost:8080/MyMethod?param1=Loic&param2=Madern
+
+exo2:
+http://localhost:8080/CallAnExecutable?param1=Loic&param2=Madern
+
+exo3:
+http://localhost:8080/incr?a=1
+
+filename to update it depends on your filepath
+
+
+
+
+
+
+
 # EIIN839 - ECUE Service oriented computing/WS
 
 This repository contains helpers for the exercises and projects of the Service Oriented Computing / Web Services course of Polytech'Nice-Sophia.
