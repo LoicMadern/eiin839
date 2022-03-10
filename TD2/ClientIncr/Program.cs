@@ -1,22 +1,20 @@
 ﻿
 
-
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ClientIncr
 {
 
     public class NewValue
     {
-     
-
         public int value { get; set; }
     }
 
-     internal class Program
+    public class ClientIncr
     {
 
-        private static string url = "http://localhost:8080/incr?a=0";
+        private static string url = "http://localhost:8080/incr?param1=1";
         static readonly HttpClient client = new HttpClient();
 
         public static async Task Main()
@@ -24,10 +22,10 @@ namespace ClientIncr
 
     
             var response = client.GetAsync(url);
-            var responseBody = await response.Result.Content.ReadAsStreamAsync();
+            var responseBody = await response.Result.Content.ReadAsStringAsync();
 
             NewValue json = JsonSerializer.Deserialize<NewValue>(responseBody);
-            Console.WriteLine(json.value);
+            Console.WriteLine("new value receive :" + json.value);
 
 
         }

@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Web;
 
-namespace BasicServerHTTPlistener
+namespace BasicServerWebServerUrlParser
 {
     internal class Program
     {
@@ -119,7 +119,7 @@ namespace BasicServerHTTPlistener
                 HttpListenerResponse response = context.Response;
 
                 // Construct a response.
-                string responseString = "<HTML><BODY> Presentation!</BODY></HTML>";
+                //string responseString = "<HTML><BODY> Presentation!</BODY></HTML>";
 
                 Type type = typeof(MyMethods);
              
@@ -127,37 +127,41 @@ namespace BasicServerHTTPlistener
                 
                 var mymethods = type.GetMethods();
 
-                bool no_problem_param = true; 
+                bool no_problem_param = false; 
                 foreach (var mymethod in mymethods)
                 {
-                    if(mymethod.Name != request.Url.Segments[1])
+                    if(mymethod.Name == request.Url.Segments[1])
                     {
-                        no_problem_param = false;
+                        no_problem_param = true;
                         break;
                     }
 
                 }
-
-    
-
+                //pour evtier le no param (falcon)
                 if (no_problem_param)
                 {
                     MethodInfo method = type.GetMethod(request.Url.Segments[1]);
+                    Console.WriteLine(method.Name);
+                    MyMethods methods = new MyMethods();
 
                     string result;
+
+
+                    //exo 3 a besoin d'un param pour cela on selectionne uniquement
                     string param1 = HttpUtility.ParseQueryString(request.Url.Query).Get("param1");
+                    Console.WriteLine(param1);
 
                     if (HttpUtility.ParseQueryString(request.Url.Query).Count > 1)
                     {
                         string param2 = HttpUtility.ParseQueryString(request.Url.Query).Get("param2");
-                        result = (string)method.Invoke(mymethods, new object[] { param1, param2 });
+                        result = (string)method.Invoke(methods, new object[] { param1, param2 });
                     }
                     else
                     {
-                        result = (string)method.Invoke(mymethods, new object[] { param1 });
+                        result = (string)method.Invoke(methods, new object[] { param1 });
                     }
 
-                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString + result);
+                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(result);
                     // Get a response stream and write the response to it.
                     response.ContentLength64 = buffer.Length;
                     System.IO.Stream output = response.OutputStream;
@@ -167,6 +171,7 @@ namespace BasicServerHTTPlistener
 
                     Console.WriteLine(result);
                 }
+               
 
 
             }
@@ -181,8 +186,8 @@ public class MyMethods
     //Exercice 1
     public string MyMethod(string param1, string param2)
     {
-        string content = "<html><body > Bonjour je m'apelle " + param1 + " " +  param2 + " </body></html>";
-        return content;
+        return "<html><body > Bonjour je m'apelle " + param1 + " " +  param2 + " </body></html>";
+        
     }
 
     //Exercice 2
@@ -210,14 +215,24 @@ public class MyMethods
         }
     }
 
+    public class NewValue
+    {
+        public int value { get; set; }
+    }
+
+
     //Exercice 3
     public string incr(string value)
     {
         int myInt = int.Parse(value);
         myInt ++;
-        Console.WriteLine(myInt);
-        string toString = myInt.ToString();
-        string content = JsonSerializer.Serialize(toString);
+        var newValueIncr = new NewValue
+        {
+            value = myInt
+        };
+        Console.WriteLine("my int incr :" + myInt);
+        
+        string content = JsonSerializer.Serialize(newValueIncr);
         return content;
     }
 }
