@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Exercice4": {
+      "commandName": "Project",
+      "commandLineArgs": "10.00 10.40"
+    }
+  }
+}
