@@ -5,15 +5,28 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 
-namespace TD4
+namespace MathsLibrary
 {
     // REMARQUE : vous pouvez utiliser la commande Renommer du menu Refactoriser pour changer le nom de classe "Service1" à la fois dans le code et le fichier de configuration.
-    public class Service1 : IService1
+    public class IMathsOperations : MathsOperations
     {
-        public string GetData(int value)
+        float Add(float op1, float op2)
         {
-            return string.Format("You entered: {0}", value);
+            return op1 + op2;
         }
+
+        float Substract(float op1, float op2)
+        {
+            return op1 - op2;
+        }
+
+        float Multiplicaty(float op1, float op2)
+        {
+            return op1 * op2;
+        }
+
+       
+
 
         public CompositeType GetDataUsingDataContract(CompositeType composite)
         {
