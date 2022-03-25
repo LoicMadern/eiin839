@@ -8,25 +8,9 @@ using System.Text;
 namespace MathsLibrary
 {
     // REMARQUE : vous pouvez utiliser la commande Renommer du menu Refactoriser pour changer le nom de classe "Service1" à la fois dans le code et le fichier de configuration.
-    public class IMathsOperations : MathsOperations
+    public class MathsOperations : IMathsOperations
     {
-        float Add(float op1, float op2)
-        {
-            return op1 + op2;
-        }
-
-        float Substract(float op1, float op2)
-        {
-            return op1 - op2;
-        }
-
-        float Multiplicaty(float op1, float op2)
-        {
-            return op1 * op2;
-        }
-
-       
-
+  
 
         public CompositeType GetDataUsingDataContract(CompositeType composite)
         {
@@ -39,6 +23,26 @@ namespace MathsLibrary
                 composite.StringValue += "Suffix";
             }
             return composite;
+        }
+
+        int IMathsOperations.Add(int a, int b)
+        {
+            return a + b;
+        }
+
+        float IMathsOperations.Divide(int a, int b)
+        {
+            return a / b;
+        }
+
+        int IMathsOperations.Substract(int a, int b)
+        {
+            return a - b;
+        }
+
+        float IMathsOperations.Multiply(int a, int b)
+        {
+            return a * b;
         }
     }
 }

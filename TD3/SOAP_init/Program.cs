@@ -19,7 +19,10 @@ namespace SOAP_init
         {
 
             var client = new ServiceReference1.CalculatorSoapClient(ServiceReference1.CalculatorSoapClient.EndpointConfiguration.CalculatorSoap);
-            Console.WriteLine(await client.ChannelFactory.CreateChannel().AddAsync(2, 2));
+            Console.WriteLine(await client.ChannelFactory.CreateChannel().AddAsync(3, 2));
+
+            var client2 = new ServiceReference2.MathsOperationsClient(ServiceReference2.MathsOperationsClient.EndpointConfiguration.BasicHttpBinding_IMathsOperations);
+            //Console.WriteLine(await client2.AddAsync(2,6));
  
 
         }
